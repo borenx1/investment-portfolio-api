@@ -13,8 +13,8 @@ impl Default for ReportSettings {
     /// The default Report Settings to use if not specified.
     fn default() -> Self {
         return Self {
-            accounting_currency: Asset::new("United States Dollar", "USD", "$", 2),
-            assets: vec![Asset::new("Bitcoin", "BTC", "₿", 8)],
+            accounting_currency: Asset::new("USD", "United States Dollar", "$", 2),
+            assets: vec![Asset::new("BTC", "Bitcoin", "₿", 8)],
         };
     }
 }

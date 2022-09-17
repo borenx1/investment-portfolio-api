@@ -3,8 +3,8 @@ use std::hash::Hash;
 
 #[derive(Serialize, Deserialize, Debug, Eq)]
 pub struct Asset {
-    name: String,
     ticker: String,
+    name: String,
     symbol: String,
     precision: u8,
 }
@@ -22,12 +22,12 @@ impl Hash for Asset {
 }
 
 impl Asset {
-    pub fn name(&self) -> &String {
-        &self.name
-    }
-
     pub fn ticker(&self) -> &String {
         &self.ticker
+    }
+
+    pub fn name(&self) -> &String {
+        &self.name
     }
 
     pub fn symbol(&self) -> &String {
@@ -38,12 +38,14 @@ impl Asset {
         &self.precision
     }
 
-    pub fn new(name: &str, ticker: &str, symbol: &str, precision: u8) -> Self {
+    pub fn new(ticker: &str, name: &str, symbol: &str, precision: u8) -> Self {
         Self {
-            name: String::from(name),
             ticker: String::from(ticker),
+            name: String::from(name),
             symbol: String::from(symbol),
             precision,
         }
     }
 }
+
+// TODO: Default currencies: ISO currency codes
