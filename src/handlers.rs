@@ -10,12 +10,12 @@ use axum::{
 
 pub fn app() -> Router {
     Router::new()
-        .route("/", get(root))
+        .route("/", get(index))
         .route("/transactions", post(add_transaction))
         .route("/reports/settings", get(default_report_settings))
-        .route("/reports/", post(generate_report))
+        .route("/reports", post(generate_report))
 }
 
-async fn root() -> MessageResponse {
+async fn index() -> MessageResponse {
     MessageResponse::from("Investment Portfolio API")
 }

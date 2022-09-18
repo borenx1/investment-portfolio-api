@@ -10,8 +10,10 @@ pub async fn default_report_settings() -> DataResponse<ReportSettings> {
 
 #[derive(Deserialize)]
 pub struct GenerateReport {
+    /// Period start, inclusive.
     #[serde(with = "ts_seconds")]
     period_start: DateTime<Utc>,
+    /// Period end, exclusive.
     #[serde(with = "ts_seconds")]
     period_end: DateTime<Utc>,
     settings: Option<ReportSettings>,
@@ -20,10 +22,10 @@ pub struct GenerateReport {
 
 pub async fn generate_report(Json(payload): Json<GenerateReport>) -> impl IntoResponse {
     // Validate period.
-    if payload.period_start > payload.period_end {
+    if payload.period_start >= payload.period_end {
         return Err((
             StatusCode::BAD_REQUEST,
-            ErrorResponse::from("Period start must be before period end"),
+            ErrorResponse::from("Period end must be after period start"),
         ));
     }
 

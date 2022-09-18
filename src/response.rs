@@ -2,9 +2,9 @@ use axum::{
     response::{IntoResponse, Response},
     Json,
 };
-use serde::Serialize;
+use serde::{Deserialize, Serialize};
 
-#[derive(Serialize)]
+#[derive(Debug, Serialize, Deserialize)]
 pub struct MessageResponse {
     pub messages: Vec<String>,
 }
@@ -33,7 +33,7 @@ impl IntoResponse for MessageResponse {
     }
 }
 
-#[derive(Serialize)]
+#[derive(Debug, Serialize, Deserialize)]
 pub struct DataResponse<T: Serialize> {
     pub data: T,
     pub messages: Vec<String>,
@@ -63,7 +63,7 @@ impl<T: Serialize> DataResponse<T> {
     }
 }
 
-#[derive(Serialize)]
+#[derive(Debug, Serialize, Deserialize)]
 pub struct ErrorResponse<T: serde::Serialize> {
     pub messages: Vec<String>,
     pub data: Option<T>,
