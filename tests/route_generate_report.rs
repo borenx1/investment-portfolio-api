@@ -11,8 +11,8 @@ async fn valid_request() {
         "/reports",
         "
             {
-                \"period_start\": 1640995200,
-                \"period_end\": 1643673600,
+                \"period_start\": \"2022-04-01T00:00:00\",
+                \"period_end\": \"2023-04-01T00:00:00\",
                 \"transactions\": []
             }
         ",
@@ -37,12 +37,12 @@ async fn validate_payload_format() {
 /// Period end must be greater than period start.
 #[tokio::test]
 async fn validate_period() {
-    let period_start = 1660000000;
-    for period_end in [1659999999, 1660000000] {
+    let period_start = "2022-04-01T00:00:00";
+    for period_end in ["2022-03-31T23:59:59", "2022-04-01T00:00:00"] {
         let body = format!(
             "{{
-                \"period_start\": {period_start},
-                \"period_end\": {period_end},
+                \"period_start\": \"{period_start}\",
+                \"period_end\": \"{period_end}\",
                 \"transactions\": []
             }}"
         );
@@ -66,15 +66,15 @@ async fn validate_transactions() {
         "/reports",
         "
             {
-                \"period_start\": 1640995200,
-                \"period_end\": 1643673600,
+                \"period_start\": \"2022-04-01T00:00:00\",
+                \"period_end\": \"2023-04-01T00:00:00\",
                 \"transactions\": [
                     {
                         \"base\": \"BTC\",
                         \"quote\": \"USD\",
                         \"base_amount\": 1,
                         \"quote_amount\": 0,
-                        \"timestamp\": 1640995200
+                        \"timestamp\": \"2022-04-01T00:00:00\"
                     }
                 ]
             }
@@ -90,4 +90,10 @@ async fn validate_transactions() {
 
     assert_eq!(message, "Transactions must not have 0 as an amount");
     // TODO: Add more transaction validation tests
+}
+
+/// Transactions outside of the accounting period are ignored.
+#[tokio::test]
+async fn ignore_out_of_range_transactions() {
+    // TODO
 }

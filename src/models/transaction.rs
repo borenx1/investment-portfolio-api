@@ -1,4 +1,4 @@
-use chrono::{serde::ts_seconds, DateTime, Utc};
+use chrono::NaiveDateTime;
 use serde::{Deserialize, Serialize};
 
 pub enum TransactionType {
@@ -15,12 +15,11 @@ pub struct Transaction {
     quote: String,
     base_amount: f64, // TODO: use decimal
     quote_amount: f64,
-    #[serde(with = "ts_seconds")]
-    timestamp: DateTime<Utc>,
+    timestamp: NaiveDateTime,
 }
 
 impl Transaction {
-    pub fn timestamp(&self) -> &DateTime<Utc> {
+    pub fn timestamp(&self) -> &NaiveDateTime {
         &self.timestamp
     }
 

@@ -1,7 +1,7 @@
 use crate::models::{report::ReportSettings, transaction::Transaction};
 use crate::response::{DataResponse, ErrorResponse};
 use axum::{http::StatusCode, response::IntoResponse, Json};
-use chrono::{serde::ts_seconds, DateTime, Utc};
+use chrono::NaiveDateTime;
 use serde::Deserialize;
 
 pub async fn default_report_settings() -> DataResponse<ReportSettings> {
@@ -11,11 +11,9 @@ pub async fn default_report_settings() -> DataResponse<ReportSettings> {
 #[derive(Deserialize)]
 pub struct GenerateReport {
     /// Period start, inclusive.
-    #[serde(with = "ts_seconds")]
-    period_start: DateTime<Utc>,
+    period_start: NaiveDateTime,
     /// Period end, exclusive.
-    #[serde(with = "ts_seconds")]
-    period_end: DateTime<Utc>,
+    period_end: NaiveDateTime,
     settings: Option<ReportSettings>,
     transactions: Vec<Transaction>,
 }
@@ -48,7 +46,7 @@ pub async fn generate_report(Json(payload): Json<GenerateReport>) -> impl IntoRe
         .transactions
         .into_iter()
         .filter(|tx| {
-            *tx.timestamp() >= payload.period_start && *tx.timestamp() <= payload.period_end
+            *tx.timestamp() >= payload.period_start && *tx.timestamp() < payload.period_end
         })
         .collect();
 
