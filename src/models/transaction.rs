@@ -19,6 +19,22 @@ pub struct Transaction {
 }
 
 impl Transaction {
+    pub fn base(&self) -> &String {
+        &self.base
+    }
+
+    pub fn quote(&self) -> &String {
+        &self.quote
+    }
+
+    pub fn base_amount(&self) -> &f64 {
+        &self.base_amount
+    }
+
+    pub fn quote_amount(&self) -> &f64 {
+        &self.quote_amount
+    }
+
     pub fn timestamp(&self) -> &NaiveDateTime {
         &self.timestamp
     }

@@ -1,8 +1,12 @@
-use crate::models::{report::ReportSettings, transaction::Transaction};
+use crate::models::{
+    report::{BalanceSheet, ReportSettings},
+    transaction::Transaction,
+};
 use crate::response::{DataResponse, ErrorResponse};
 use axum::{http::StatusCode, response::IntoResponse, Json};
 use chrono::NaiveDateTime;
 use serde::Deserialize;
+use std::collections::HashMap;
 
 pub async fn default_report_settings() -> DataResponse<ReportSettings> {
     DataResponse::from(ReportSettings::default())
@@ -15,6 +19,7 @@ pub struct GenerateReport {
     /// Period end, exclusive.
     period_end: NaiveDateTime,
     settings: Option<ReportSettings>,
+    balance: Option<HashMap<String, f64>>,
     transactions: Vec<Transaction>,
 }
 
@@ -46,24 +51,38 @@ pub async fn generate_report(Json(payload): Json<GenerateReport>) -> impl IntoRe
         .transactions
         .into_iter()
         .filter(|tx| {
-            *tx.timestamp() >= payload.period_start && *tx.timestamp() < payload.period_end
+            tx.timestamp() >= &payload.period_start && tx.timestamp() < &payload.period_end
         })
         .collect();
 
-    // Validate transactions.
-    if transactions.iter().any(|tx| tx.is_invalid()) {
-        return Err((
-            StatusCode::BAD_REQUEST,
-            ErrorResponse::from("Transactions must not have 0 as an amount"),
-        ));
+    // Calculate transactions.
+    for tx in &transactions {
+        // Validate transactions.
+        if tx.is_invalid() {
+            return Err((
+                StatusCode::BAD_REQUEST,
+                ErrorResponse::from("Transactions must not have 0 as an amount"),
+            ));
+        }
+        if !settings.contains_transaction_asset(tx) {
+            return Err((
+                StatusCode::BAD_REQUEST,
+                ErrorResponse::from(
+                    "Transactions base and quote assets must be in the report settings",
+                ),
+            ));
+        }
     }
 
-    // TODO
+    let balance_sheet = BalanceSheet::generate(&transactions, payload.balance, &settings);
 
     let response = if is_default_settings {
-        DataResponse::with_message(transactions, String::from("Default report settings used"))
+        DataResponse::with_message(
+            balance_sheet.balance().clone(),
+            String::from("Default report settings used"),
+        )
     } else {
-        DataResponse::from(transactions)
+        DataResponse::from(balance_sheet.balance().clone())
     };
 
     Ok(response)

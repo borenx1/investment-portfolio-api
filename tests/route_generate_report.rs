@@ -90,6 +90,7 @@ async fn validate_transactions() {
 
     assert_eq!(message, "Transactions must not have 0 as an amount");
     // TODO: Add more transaction validation tests
+    // TODO: Tx assets must be in report settings.
 }
 
 /// Transactions outside of the accounting period are ignored.
